@@ -77,5 +77,4 @@ public class BasePage {
                 return driver = new ChromeDriver(options);
         }
     }
-
 }
