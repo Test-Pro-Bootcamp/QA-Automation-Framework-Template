@@ -7,8 +7,7 @@ import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import Pages.HomePage;
@@ -18,31 +17,69 @@ import org.testng.annotations.Test;
 
 import static Pages.BasePage.driver;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.AfterMethod;
-
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.nio.charset.MalformedInputException;
 import java.time.Duration;
+import java.util.HashMap;
+
 
 @Test
 public class BaseTest {
- //   public static WebDriver driver = null;
+    public static final ThreadLocal<WebDriver> threadDriver = new ThreadLocal<WebDriver>();
 
- /*   @BeforeSuite
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }*/
-   @BeforeMethod
+
+    @DataProvider(name = "IncorrectLoginData")
+    public Object[][] getDataFromDataProviders() {
+        return new Object[][]{
+                {"invalid@gmail.com", "MkoIkaMarkMia-789"},
+                {"Iparzyan@gmail.com", ""},
+                {"", ""}
+        };
+    }
+
+    public static WebDriver lambdaTest() throws MalformedURLException {
+        String hubURL = "https://hub.lambdatest.com/wd/hub";
+        ChromeOptions browserOptions = new ChromeOptions();
+        browserOptions.setPlatformName("Windows 10");
+        browserOptions.setBrowserVersion("114.0");
+        HashMap<String, Object> ltOptions = new HashMap<String, Object>();
+        ltOptions.put("username", "iskuhi.parzyan");
+        ltOptions.put("accessKey", "33q9TjWhfcrh5bCnrTJyLVDeJGtiHypKAKCIGM3O7eYkmLxidt");
+        ltOptions.put("project", "AutomationTest");
+        ltOptions.put("selenium_version", "4.0.0");
+        ltOptions.put("w3c", true);
+        browserOptions.setCapability("LT:Options", ltOptions);
+        return new RemoteWebDriver(new URL(hubURL), browserOptions);
+
+    }
+    //   public static WebDriver driver = null;
+
+    /*   @BeforeSuite
+       public static void setupClass() {
+           WebDriverManager.chromedriver().setup();
+       }*/
+    @BeforeMethod
     @Parameters({"BaseUrl"})
     public void launchBrowser(String BaseUrl) throws MalformedURLException {
         String url = BaseUrl;
-        driver.navigate().to(url);
-        driver = pickBrowser(System.getProperty("browser"));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        getDriver().navigate().to(url);
 
+        //driver = pickBrowser(System.getProperty("browser"));
+        threadDriver.set(pickBrowser(System.getProperty("browser")));
+        getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
+    }
+
+    @AfterMethod
+    public void closeBrowser() {
+        getDriver().quit();
+        threadDriver.remove();
+    }
+
+    public WebDriver getDriver() {
+        return threadDriver.get();
     }
 
     public static WebDriver pickBrowser(String browserName) throws MalformedURLException {
@@ -56,7 +93,7 @@ public class BaseTest {
                 return driver = new FirefoxDriver();
             case "MSEdge":
                 WebDriverManager.edgedriver().setup();
-                EdgeOptions edgeOptions=new EdgeOptions();
+                EdgeOptions edgeOptions = new EdgeOptions();
                 edgeOptions.addArguments("--remote-allow-origins=*");
                 return driver = new EdgeDriver();
 
@@ -69,6 +106,8 @@ public class BaseTest {
             case "grid-chrome":
                 caps.setCapability("browserName", "chrome");
                 return driver = new RemoteWebDriver(URI.create(gridURL).toURL(), caps);
+            case "cloud":
+                return lambdaTest();
 
             default:
                 WebDriverManager.chromedriver().setup();

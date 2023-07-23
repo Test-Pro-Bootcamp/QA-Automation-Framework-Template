@@ -18,13 +18,13 @@ dependencies {
 task testSmoke(type:Test) {
     useTestNG() {
         suites "src/test/resources/Smoke.xml"
-       systemProperty("browser", System.getProperty("browserName"))
+     //  systemProperty("browser", System.getProperty("browserName"))
     }
 }
-/*task test (type: Test){
+test {
     useTestNG() {
         suites "src/test/resources/TestNG.xml"
-        //systemProperty("browser",System.getProperty("browserName"))
+        systemProperty("browser",System.getProperty("browserName"))
 
     }
-}*/
+}
