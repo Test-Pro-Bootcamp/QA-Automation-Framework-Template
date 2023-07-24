@@ -63,12 +63,14 @@ public class BaseTest {
     @BeforeMethod
     @Parameters({"BaseUrl"})
     public void launchBrowser(String BaseUrl) throws MalformedURLException {
-        String url = BaseUrl;
-        getDriver().navigate().to(url);
 
         //driver = pickBrowser(System.getProperty("browser"));
         threadDriver.set(pickBrowser(System.getProperty("browser")));
         getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        String url = BaseUrl;
+        getDriver().navigate().to(url);
+
 
     }
 
