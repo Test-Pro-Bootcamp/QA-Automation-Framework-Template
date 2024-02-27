@@ -12,6 +12,7 @@ import java.time.Duration;
 public class Homework16 extends BaseTest {
 
     public WebDriver driver;
+    String url = "https://qa.koel.app/";
 
     @Test
     public void registrationNavigation() {
