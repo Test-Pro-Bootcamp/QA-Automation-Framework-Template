@@ -13,10 +13,14 @@ dependencies {
     testImplementation 'org.testng:testng:7.6.1'
     implementation 'org.seleniumhq.selenium:selenium-java:4.5.0'
     testImplementation 'io.github.bonigarcia:webdrivermanager:5.8.0'
+    testImplementation 'io.rest-assured:rest-assured:5.4.0'
 }
 
 test {
     useTestNG() {
-        suites "src/test/resources/TestNG.xml"
+        //suites "src/test/resources/TestNG.xml"
+        //suites "src/test/resources/Parallel.xml"
+        //systemProperty "browser", System.getProperty("browserName")
+        suites "src/test/resources/RestAssured.xml"
     }
 }
